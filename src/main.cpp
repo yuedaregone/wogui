@@ -71,7 +71,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	BITMAPINFO& bmpInfo = sbmpInfo->m_BitmapInfo;
 	bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
 	bmpInfo.bmiHeader.biWidth = width;
-	bmpInfo.bmiHeader.biHeight = -(int)height;
+	bmpInfo.bmiHeader.biHeight = height;
 	bmpInfo.bmiHeader.biPlanes = 1;
 	bmpInfo.bmiHeader.biBitCount = 32;
 	bmpInfo.bmiHeader.biCompression = BI_BITFIELDS;
@@ -152,16 +152,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	wglMakeCurrent(dc, 0);
 	wglMakeCurrent(pbufferDC, pbufferGLRC);
-
-
-
+	
 	glEnable(GL_ALPHA_TEST);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 	glClearColor(0, 0, 0, 0.5);
 	
 	glViewport(0, 0, width, height);
@@ -181,16 +178,34 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		else
 		{
 			//TODO: Update And Render
+			//memset(bgBuff, 0, width * height * sizeof(UINT));
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glColor3f(0.2,0.5,0.8);
 
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			
+
+			glBegin(GL_TRIANGLES);
+			
+			glColor4f(0.2, 0.5, 0.2, 0.5);
 			glVertex3f(-1.0, -1.0, 0.0);
 			glVertex3f(1.0, -1.0, 0.0);
 			glVertex3f(0.0, 1.0, 0.0);
 
-			memset(bgBuff, 0, width * height * sizeof(UINT));
+			glEnd();
+
+			glBegin(GL_TRIANGLES);
+
+			glColor4f(0.7, 0.3, 0.1, 0.5);
+			glVertex3f(-1.0, -1.0, 0.0);
+			glVertex3f(1.0, -1.0, 0.0);
+			glVertex3f(1.0, 1.0, 0.0);
+
+			glEnd();
+
+			
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			glReadPixels(0, 0, width, height, GL_BGRA_EXT, GL_UNSIGNED_BYTE, bgBuff);
 					
