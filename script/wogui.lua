@@ -8,6 +8,7 @@ project "wogui"
 		path.join(PROJ_DIR, "src"),		
 		--path.join(PROJ_DIR, "3rd/glm"),
 		path.join(PROJ_DIR, "3rd/GLEW2.1.0/include"),
+		path.join(PROJ_DIR, "3rd/imgui"),
 	}
 
 	files {
@@ -29,6 +30,9 @@ project "wogui"
 	configuration { "Debug" }
 		defines {
 			"_Debug",
+		}
+		links {
+			"imguiDebug",
 		}
 	
 	configuration { "vs* or mingw*" }

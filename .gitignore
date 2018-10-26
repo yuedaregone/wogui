@@ -3,6 +3,7 @@
 .DS_Store
 .git
 .svn
+.vs
 tags
 .gdb_history
 build

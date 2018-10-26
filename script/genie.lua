@@ -15,8 +15,9 @@ solution "wogui"
 
 SOLUTION_DIR = path.getabsolute("..")
 dofile "toolchain.lua"
-toolchain(path.join(SOLUTION_DIR, "build"), "")
+toolchain(path.join(SOLUTION_DIR, "build"), path.join(SOLUTION_DIR, "build"))
 
+dofile "imgui.lua"
 dofile "wogui.lua"
 
 
