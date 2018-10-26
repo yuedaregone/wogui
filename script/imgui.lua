@@ -31,7 +31,8 @@ project "imgui"
 	
 	configuration { "vs* or mingw*" }
 		excludes {
-			
+			path.join(PROJ_DIR, "3rd/imgui/imgui_impl_opengl3.h"),
+			path.join(PROJ_DIR, "3rd/imgui/imgui_impl_opengl3.cpp"),
 		}
 		links {			
 			--"opengl32",

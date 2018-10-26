@@ -4,6 +4,9 @@
 #include <malloc.h>
 #include "GL\glew.h"
 #include "GL\wglew.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_opengl2.h"
 
 #define WINDOW_NAME "WOGUI"
 #define WINDOW_WIDTH 300
@@ -14,6 +17,15 @@ struct SBmpInfo
 	BITMAPINFO	m_BitmapInfo;
 	RGBQUAD		m_bmiColors[2];	// 为BITMAPINFO的m_bmiColors补充两个元素空间
 };
+
+LRESULT CALLBACK WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (!ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+	{
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+	return 0;
+}
 
 //#define CONSOLE_DEBUG
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -33,7 +45,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = DefWindowProc;
+	wcex.lpfnWndProc = WndProcHandler;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hInstance;
@@ -167,6 +179,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplOpenGL2_Init();
+
+	ImGui::StyleColorsDark();
+	bool show_demo_window = true;
+	bool show_another_window = false;
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+
 	MSG msg = { 0 };
 	while (WM_QUIT != msg.message)
 	{
@@ -203,7 +227,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			glVertex3f(1.0, -1.0, 0.0);
 			glVertex3f(1.0, 1.0, 0.0);
 
-			glEnd();
+			glEnd();	
+
+
+			ImGui_ImplOpenGL2_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+
+			ImGui::NewFrame();
+			if (show_demo_window)
+				ImGui::ShowDemoWindow(&show_demo_window);
+
+			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+			{
+				static float f = 0.0f;
+				static int counter = 0;
+
+				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+				ImGui::Checkbox("Another Window", &show_another_window);
+
+				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
+				ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+					counter++;
+				ImGui::SameLine();
+				ImGui::Text("counter = %d", counter);
+
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+				ImGui::End();
+			}
+			ImGui::Render();
+			
+			ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
 			
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -230,6 +288,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			::UpdateLayeredWindow(hwnd, dc, &p, &s, layerDc, &m_originPos, 0, &blend, ULW_ALPHA);
 		}
 	}
+
+	ImGui_ImplOpenGL2_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(glrc);
 
