@@ -14,7 +14,9 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#include <windowsx.h>
 #include <tchar.h>
+#include <imgui_internal.h>
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
@@ -117,6 +119,14 @@ static bool ImGui_ImplWin32_UpdateMouseCursor()
     return true;
 }
 
+static void SetWindowPos(POINT& pos)
+{
+	RECT rect;
+	GetWindowRect(g_hWnd, &rect);
+
+	MoveWindow(g_hWnd, pos.x, pos.y, rect.right - rect.left, rect.top - rect.bottom, true);
+}
+
 static void ImGui_ImplWin32_UpdateMousePos()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -132,9 +142,14 @@ static void ImGui_ImplWin32_UpdateMousePos()
     // Set mouse position
     io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
     POINT pos;
-    if (::GetActiveWindow() == g_hWnd && ::GetCursorPos(&pos))
-        if (::ScreenToClient(g_hWnd, &pos))
-            io.MousePos = ImVec2((float)pos.x, (float)pos.y);
+	if (::GetActiveWindow() == g_hWnd && ::GetCursorPos(&pos))
+	{
+		if (::ScreenToClient(g_hWnd, &pos))
+		{
+			io.MousePos = ImVec2((float)pos.x, (float)pos.y);		
+		}			
+	}
+        
 }
 
 void    ImGui_ImplWin32_NewFrame()
@@ -199,11 +214,26 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
         if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK) button = 0;
         if (msg == WM_RBUTTONDOWN || msg == WM_RBUTTONDBLCLK) button = 1;
         if (msg == WM_MBUTTONDOWN || msg == WM_MBUTTONDBLCLK) button = 2;
-        if (!ImGui::IsAnyMouseDown() && ::GetCapture() == NULL)
-            ::SetCapture(hwnd);
-        io.MouseDown[button] = true;
+
+		ImGuiContext * context = ImGui::GetCurrentContext();
+		if (context != NULL && context->NavWindow != NULL && context->NavWindow->Flags | ImGuiWindowFlags_NoMove)
+		{
+			::SendMessageA(hwnd, WM_SYSCOMMAND, 0xF012, 0);			
+		}
+		else
+		{
+			if (!ImGui::IsAnyMouseDown() && ::GetCapture() == NULL)
+				::SetCapture(hwnd);
+			io.MouseDown[button] = true;
+		}
+       
         return 0;
     }
+	case  WM_MOUSEMOVE:
+	{
+		
+		return 0;
+	}	
     case WM_LBUTTONUP:
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:

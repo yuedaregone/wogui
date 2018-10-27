@@ -6,7 +6,7 @@
 #include "GL\wglew.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
-#include "imgui_impl_opengl2.h"
+#include "framework.h"
 
 #define WINDOW_NAME "WOGUI"
 #define WINDOW_WIDTH 300
@@ -17,6 +17,7 @@ struct SBmpInfo
 	BITMAPINFO	m_BitmapInfo;
 	RGBQUAD		m_bmiColors[2];	// 为BITMAPINFO的m_bmiColors补充两个元素空间
 };
+
 
 LRESULT CALLBACK WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -65,7 +66,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UINT width = WINDOW_WIDTH;
 	UINT height = WINDOW_HEIGHT;
 	
-	DWORD style = WS_EX_LAYERED | WS_EX_TOOLWINDOW;
+	DWORD style = WS_EX_LAYERED;// | WS_EX_TOOLWINDOW;
 	HWND hwnd = CreateWindowEx(style, WINDOW_NAME, WINDOW_NAME, WS_VISIBLE | WS_SYSMENU,
 		0, 0, width, height, NULL, NULL, hInstance, NULL);
 
@@ -165,31 +166,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wglMakeCurrent(dc, 0);
 	wglMakeCurrent(pbufferDC, pbufferGLRC);
 	
-	glEnable(GL_ALPHA_TEST);
-	//glEnable(GL_DEPTH_TEST);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	
-	glClearColor(0, 0, 0, 0.5);
-	
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	InitOpenGL((int)width, (int)height);
+	InitGUI(hwnd);
 
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui_ImplWin32_Init(hwnd);
-	ImGui_ImplOpenGL2_Init();
+	LARGE_INTEGER freq;
+	LARGE_INTEGER now;
+	LARGE_INTEGER last;
+	LONGLONG interval;
+	LONGLONG frameDelta;
 
-	ImGui::StyleColorsDark();
-	bool show_demo_window = true;
-	bool show_another_window = false;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	double delta = 1.0 / GetFPS();
+	QueryPerformanceFrequency(&freq);
+	frameDelta = delta * freq.QuadPart;
 
+	QueryPerformanceCounter(&last);	
 
 	MSG msg = { 0 };
 	while (WM_QUIT != msg.message)
@@ -201,68 +191,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		else
 		{
-			//TODO: Update And Render
-			//memset(bgBuff, 0, width * height * sizeof(UINT));
-
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			
-
-			glBegin(GL_TRIANGLES);
-			
-			glColor4f(0.2, 0.5, 0.2, 0.5);
-			glVertex3f(-1.0, -1.0, 0.0);
-			glVertex3f(1.0, -1.0, 0.0);
-			glVertex3f(0.0, 1.0, 0.0);
-
-			glEnd();
-
-			glBegin(GL_TRIANGLES);
-
-			glColor4f(0.7, 0.3, 0.1, 0.5);
-			glVertex3f(-1.0, -1.0, 0.0);
-			glVertex3f(1.0, -1.0, 0.0);
-			glVertex3f(1.0, 1.0, 0.0);
-
-			glEnd();	
-
-
-			ImGui_ImplOpenGL2_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-
-			ImGui::NewFrame();
-			if (show_demo_window)
-				ImGui::ShowDemoWindow(&show_demo_window);
-
-			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+			QueryPerformanceCounter(&now);
+			interval = now.QuadPart - last.QuadPart;
+			if (interval < frameDelta)
 			{
-				static float f = 0.0f;
-				static int counter = 0;
-
-				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-				ImGui::Checkbox("Another Window", &show_another_window);
-
-				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-				ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-					counter++;
-				ImGui::SameLine();
-				ImGui::Text("counter = %d", counter);
-
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-				ImGui::End();
+				Sleep(1);
+				continue;
 			}
-			ImGui::Render();
-			
-			ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+			last.QuadPart = now.QuadPart;
 
+			//TODO: Update And Render			
+			Render();
 			
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			glReadPixels(0, 0, width, height, GL_BGRA_EXT, GL_UNSIGNED_BYTE, bgBuff);
@@ -289,11 +228,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 	}
 
-	ImGui_ImplOpenGL2_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	DestroyGUI();
 
-	wglMakeCurrent(NULL, NULL);
+	wglMakeCurrent(NULL, NULL);	
+	wglDeleteContext(pbufferGLRC);
 	wglDeleteContext(glrc);
 
 	ReleaseDC(hwnd, dc);
