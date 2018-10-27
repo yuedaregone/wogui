@@ -41,6 +41,23 @@ static INT64                g_Time = 0;
 static INT64                g_TicksPerSecond = 0;
 static ImGuiMouseCursor     g_LastMouseCursor = ImGuiMouseCursor_COUNT;
 
+static void StaticWindowMoveCallback(ImVec2 offset)
+{
+	(void)offset;
+	ImGuiContext* ctx = ImGui::GetCurrentContext();
+	if (ctx->MovingWindow == NULL && ::GetCapture() == g_hWnd)
+	{
+		ReleaseCapture();
+		SendMessage(g_hWnd, WM_SYSCOMMAND, SC_MOVE | HTCAPTION, 0);		
+
+		ImGuiIO& io = ImGui::GetIO();
+		for (size_t i = 0; i < sizeof(io.MouseDown) / sizeof(io.MouseDown[0]); i++)
+		{
+			io.MouseDown[i] = false;
+		}
+	}
+}
+
 // Functions
 bool    ImGui_ImplWin32_Init(void* hwnd)
 {
@@ -48,6 +65,8 @@ bool    ImGui_ImplWin32_Init(void* hwnd)
         return false;
     if (!::QueryPerformanceCounter((LARGE_INTEGER *)&g_Time))
         return false;
+
+	ImGui::MoveWindowCallback = StaticWindowMoveCallback;
 
     // Setup back-end capabilities flags
     g_hWnd = (HWND)hwnd;
@@ -117,14 +136,6 @@ static bool ImGui_ImplWin32_UpdateMouseCursor()
         ::SetCursor(::LoadCursor(NULL, win32_cursor));
     }
     return true;
-}
-
-static void SetWindowPos(POINT& pos)
-{
-	RECT rect;
-	GetWindowRect(g_hWnd, &rect);
-
-	MoveWindow(g_hWnd, pos.x, pos.y, rect.right - rect.left, rect.top - rect.bottom, true);
 }
 
 static void ImGui_ImplWin32_UpdateMousePos()
@@ -215,25 +226,11 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
         if (msg == WM_RBUTTONDOWN || msg == WM_RBUTTONDBLCLK) button = 1;
         if (msg == WM_MBUTTONDOWN || msg == WM_MBUTTONDBLCLK) button = 2;
 
-		ImGuiContext * context = ImGui::GetCurrentContext();
-		if (context != NULL && context->NavWindow != NULL && context->NavWindow->Flags | ImGuiWindowFlags_NoMove)
-		{
-			::SendMessageA(hwnd, WM_SYSCOMMAND, 0xF012, 0);			
-		}
-		else
-		{
-			if (!ImGui::IsAnyMouseDown() && ::GetCapture() == NULL)
-				::SetCapture(hwnd);
-			io.MouseDown[button] = true;
-		}
-       
+		if (!ImGui::IsAnyMouseDown() && ::GetCapture() == NULL)
+			::SetCapture(hwnd);
+		io.MouseDown[button] = true;  
         return 0;
-    }
-	case  WM_MOUSEMOVE:
-	{
-		
-		return 0;
-	}	
+    }	
     case WM_LBUTTONUP:
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
@@ -244,7 +241,7 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
         if (msg == WM_MBUTTONUP) button = 2;
         io.MouseDown[button] = false;
         if (!ImGui::IsAnyMouseDown() && ::GetCapture() == hwnd)
-            ::ReleaseCapture();
+            ::ReleaseCapture();		
         return 0;
     }
     case WM_MOUSEWHEEL:

@@ -7,10 +7,11 @@
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "framework.h"
+#include "console.h"
 
 #define WINDOW_NAME "WOGUI"
-#define WINDOW_WIDTH 300
-#define WINDOW_HEIGHT 300
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
 
 struct SBmpInfo
 {

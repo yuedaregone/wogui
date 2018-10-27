@@ -955,6 +955,8 @@ static ImGuiWindow*     NavRestoreLastChildNavWindow(ImGuiWindow* window);
 static void             UpdateMouseInputs();
 static void             UpdateMouseWheel();
 static void             UpdateManualResize(ImGuiWindow* window, const ImVec2& size_auto_fit, int* border_held, int resize_grip_count, ImU32 resize_grip_col[4]);
+
+ImGuiMoveWindowCallback MoveWindowCallback = NULL;
 }
 
 // Test engine hooks (imgui-test)
@@ -2910,9 +2912,12 @@ void ImGui::StartMouseMovingWindow(ImGuiWindow* window)
     FocusWindow(window);
     SetActiveID(window->MoveId, window);
     g.NavDisableHighlight = true;
-    g.ActiveIdClickOffset = g.IO.MousePos - window->RootWindow->Pos;
-    if (!(window->Flags & ImGuiWindowFlags_NoMove) && !(window->RootWindow->Flags & ImGuiWindowFlags_NoMove))
-        g.MovingWindow = window;
+	ImVec2 clickOffset = g.IO.MousePos - window->RootWindow->Pos;
+	g.ActiveIdClickOffset = clickOffset;
+	if (!(window->Flags & ImGuiWindowFlags_NoMove) && !(window->RootWindow->Flags & ImGuiWindowFlags_NoMove))
+		g.MovingWindow = window;
+	else if (MoveWindowCallback != NULL)
+		MoveWindowCallback(clickOffset);
 }
 
 // Handle mouse moving window
