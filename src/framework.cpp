@@ -4,13 +4,15 @@
 #include <imgui_impl_opengl2.h>
 #include <imgui_impl_win32.h>
 #include <time.h>
+#include <stdio.h>
+#include "datasource.h"
 
 int GetFPS()
 {
 	return 30;
 }
 
-void InitOpenGL(int width, int height)
+static void InitOpenGL(int width, int height)
 {
 	glEnable(GL_ALPHA_TEST);
 	//glEnable(GL_DEPTH_TEST);
@@ -27,12 +29,12 @@ void InitOpenGL(int width, int height)
 	glLoadIdentity();
 }
 
-void DestroyOpenGL()
+static void DestroyOpenGL()
 {
 
 }
 
-void InitGUI(void* window)
+static void InitGUI(void* window)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -43,14 +45,16 @@ void InitGUI(void* window)
 	ImGui::StyleColorsDark();	
 }
 
-void DestroyGUI()
+static void DestroyGUI()
 {
 	ImGui_ImplOpenGL2_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
 
-void Render()
+bool ischeck = false;
+
+static void Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	/*
@@ -78,29 +82,62 @@ void Render()
 
 	ImGui_ImplOpenGL2_NewFrame();
 	ImGui_ImplWin32_NewFrame();
-
 	
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-	ImGui::NewFrame();	
-
-	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+	ImGui::NewFrame();		
 	{
-		static float f = 0.0f;
-		static int counter = 0;
+		static float time = 0.0f;		
+		static ImVec4 color = ImVec4(0.0f, 0.478f, 0.8f, 1.00f);
 
-		ImGui::Begin("Hello!", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);                          // Create a window called "Hello, world!" and append into it.
-
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		time += ImGui::GetIO().DeltaTime;
+		ImGui::Begin(TEXT("!"), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize);
+			
 		
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Checkbox("IsÄã Over?", &ischeck);
+		
+
+		ImGui::TextColored(color,  "This is some useful text.");
+
+		if (time > 3600.0f)
+		{			
+			if (int(time + 0.5f) == int(time))
+			{
+				color = ImVec4(0.0f, 0.478f, 0.8f, 1.00f);
+			}
+			else
+			{
+				color = ImVec4(0.855f, 0.227f, 0.0f, 1.00f);
+			}
+
+			if (ImGui::Button("Click"))
+			{
+				time = 0.0f;
+				color = ImVec4(0.0f, 0.478f, 0.8f, 1.00f);
+			}
+		}		
 		ImGui::End();
 	}
 	ImGui::Render();
 
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+}
+
+
+void InitFramework(int width, int height, void* window)
+{
+	InitDataSource();
+
+	InitOpenGL(width, height);
+	InitGUI(window);
+}
+
+void UpdateFramework()
+{
+	Render();
+}
+
+void EndFramework()
+{
+	DestroyOpenGL();
+	DestroyGUI();
 }

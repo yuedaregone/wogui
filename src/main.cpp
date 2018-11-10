@@ -10,8 +10,8 @@
 #include "console.h"
 
 #define WINDOW_NAME "WOGUI"
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 200
+#define WINDOW_HEIGHT 150
 
 struct SBmpInfo
 {
@@ -167,8 +167,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wglMakeCurrent(dc, 0);
 	wglMakeCurrent(pbufferDC, pbufferGLRC);
 	
-	InitOpenGL((int)width, (int)height);
-	InitGUI(hwnd);
+	InitFramework((int)width, (int)height, hwnd);
 
 	LARGE_INTEGER freq;
 	LARGE_INTEGER now;
@@ -202,7 +201,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			last.QuadPart = now.QuadPart;
 
 			//TODO: Update And Render			
-			Render();
+			UpdateFramework();
 			
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			glReadPixels(0, 0, width, height, GL_BGRA_EXT, GL_UNSIGNED_BYTE, bgBuff);
@@ -229,7 +228,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 	}
 
-	DestroyGUI();
+	EndFramework();
 
 	wglMakeCurrent(NULL, NULL);	
 	wglDeleteContext(pbufferGLRC);

@@ -3,12 +3,8 @@
 
 int GetFPS();
 
-void InitOpenGL(int width, int height);
-void DestroyOpenGL();
-
-void InitGUI(void* window);
-void DestroyGUI();
-
-void Render();
+void InitFramework(int width, int height, void* window);
+void UpdateFramework();
+void EndFramework();
 
 #endif
