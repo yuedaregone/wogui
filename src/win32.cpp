@@ -34,5 +34,35 @@ void get_date_today(int* y, int* m, int* d)
 	*d = st->tm_mday;
 }
 
+void get_date_preday(int cy, int cm, int cd, int * y, int * m, int * d)
+{
+	struct tm st;
+	memset(&st, 0, sizeof(st));
+	st.tm_year = cy - 1900;
+	st.tm_mon = cm - 1;
+	st.tm_mday = cd;
+	time_t t = mktime(&st);
+	t -= 3600 * 12;
+	struct tm* rt = localtime(&t);
+	*y = rt->tm_year + 1900;
+	*m = rt->tm_mon + 1;
+	*d = rt->tm_mday;
+}
+
+void get_date_nextday(int cy, int cm, int cd, int * y, int * m, int * d)
+{
+	struct tm st;
+	memset(&st, 0, sizeof(st));
+	st.tm_year = cy - 1900;
+	st.tm_mon = cm - 1;
+	st.tm_mday = cd;
+	time_t t = mktime(&st);
+	t += 3600 * 12;
+	struct tm* rt = localtime(&t);
+	*y = rt->tm_year + 1900;
+	*m = rt->tm_mon + 1;
+	*d = rt->tm_mday;
+}
+
 
 

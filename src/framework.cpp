@@ -43,6 +43,7 @@ static void InitGUI(void* window)
 	ImGui_ImplOpenGL2_Init();
 
 	ImGui::StyleColorsDark();	
+	io.Fonts->AddFontFromFileTTF("c:/windows/fonts/simhei.ttf", 12.0f, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 }
 
 static void DestroyGUI()
@@ -92,13 +93,16 @@ static void Render()
 		time += ImGui::GetIO().DeltaTime;
 		ImGui::Begin(TEXT("!"), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize);
 			
-		const char* word = get_data_index(0);
-		ImGui::Checkbox(word, &ischeck);
-		
+		int count = dsrc_get_data_count();
+		for (int i = 0; i < count; ++i)
+		{
+			const char* word = dsrc_get_data_index(i);
+			ImGui::Checkbox(word, &ischeck);
+		}
 
 		ImGui::TextColored(color,  "This is some useful text.");
 
-		if (time > 3600.0f)
+		if (time > 5)
 		{			
 			if (int(time + 0.5f) == int(time))
 			{
@@ -125,7 +129,7 @@ static void Render()
 
 void InitFramework(int width, int height, void* window)
 {
-	init_data_source();
+	dsrc_init_data_source();
 
 	InitOpenGL(width, height);
 	InitGUI(window);

@@ -17,7 +17,8 @@ struct DataPage
 	DataPage* next;
 };
 
-static struct  DataPage* s_page = NULL;
+static struct DataPage* s_today_page = NULL;
+static struct DataPage* s_cur_page = NULL;
 static const buffer_t* s_path = NULL;
 
 static buffer_t* get_recode_file_name(int y, int m, int d)
@@ -27,13 +28,6 @@ static buffer_t* get_recode_file_name(int y, int m, int d)
 	return buff;
 }
 
-static buffer_t* get_today_recode_file_name()
-{
-	int y, m, d = 0;
-	get_date_today(&y, &m, &d);
-	return get_recode_file_name(y, m, d);
-}
-
 static void init_data_page(DataPage* page)
 {
 	if (page == NULL) return;
@@ -41,77 +35,126 @@ static void init_data_page(DataPage* page)
 	page->prev = page->next = NULL;
 }
 
-static struct DataPage* read_data_page(const char* filename)
+static struct DataPage* load_data_page(int y, int m, int d)
 {
-	 FILE* file = fs_open(filename, FS_OPEN_READ);
-	 size_t fsize = fs_fsize(file);
-	 size_t lines = fs_flines(file);
+	buffer_t* filename = get_recode_file_name(y, m, d);
+	FILE* file = fs_open(filename->data, FS_OPEN_READ);
+	size_t fsize = fs_fsize(file);
+	size_t lines = fs_flines(file);
 
-	 size_t stsize = sizeof(struct DataPage) + lines * sizeof(const char*) + fsize + 1;
-	 struct DataPage* page = (struct DataPage*)malloc(stsize);
-	 init_data_page(page);
+	buffer_free(filename);
 
-	 char* content = (char*)(page + 1) + lines * sizeof(const char*);	
-	 fread(content, 1, fsize, file);
-	 *(content + fsize) = '\0';
+	size_t stsize = sizeof(struct DataPage) + lines * sizeof(const char*) + fsize + 1;
+	struct DataPage* page = (struct DataPage*)malloc(stsize);
+	page->year = y;
+	page->month = m;
+	page->day = d;
+	page->lines = 0;
+	page->prev = page->next = NULL;
+
+	char* content = (char*)(page + 1) + lines * sizeof(const char*);	
+	fread(content, 1, fsize, file);
+	*(content + fsize) = '\0';
 	 
-	 char** ctxindex = (char**)(page + 1);
-	 char* lastline = content;
-	 int tl = 0;
-	 for (int i = 0; i < fsize; ++i) {
-		 if (*(content + i) == '\n') {
-			 *(content + i) = '\0';
-			 if (i > 0 && *(content + i - 1) == '\r') {
-				 *(content + i - 1) = '\0';
-			 }
-			 if (strlen(lastline) > 0 && *lastline != '#') {
-				 *(ctxindex + tl++) = lastline;
-				 ++page->lines;
-			 }
-			 lastline = content + i + 1;
-		 }
-	 }
-	 if (strlen(lastline) > 0 && *lastline != '#') {
-		 *(ctxindex + tl++) = lastline;
-		 ++page->lines;
-	 }
-	 fs_close(file);
-	 return page;
+	char** ctxindex = (char**)(page + 1);
+	char* lastline = content;
+	int tl = 0;
+	for (int i = 0; i < fsize; ++i) {
+		if (*(content + i) == '\n') {
+			*(content + i) = '\0';
+			if (i > 0 && *(content + i - 1) == '\r') {
+				*(content + i - 1) = '\0';
+			}
+			if (strlen(lastline) > 0 && *lastline != '#') {
+				*(ctxindex + tl++) = lastline;
+				++page->lines;
+			}
+			lastline = content + i + 1;
+		}
+	}
+	if (strlen(lastline) > 0 && *lastline != '#') {
+		*(ctxindex + tl++) = lastline;
+		++page->lines;
+	}
+	fs_close(file);
+	return page;
 }
 
-void init_data_source()
+void dsrc_init_data_source()
 {
 	buffer_t* cur = get_current_path();
 	buffer_append(cur, "\\rc\\");
 	s_path = cur;
 
-	if (fs_exists(s_path->data) != 0)
-	{
+	if (fs_exists(s_path->data) != 0)	{
 		fs_mkdir(s_path->data, 0);
 	}
-	
-	buffer_t* filename = get_today_recode_file_name();
-	
-	s_page = read_data_page(filename->data);
+	dsrc_load_today_data();
 }
 
-int get_data_count()
+void dsrc_load_today_data()
 {
-	return s_page->lines;
+	if (s_today_page == NULL) {
+		int y, m, d = 0;
+		get_date_today(&y, &m, &d);
+		s_cur_page = s_today_page = load_data_page(y, m, d);
+	} else {
+		s_cur_page = s_today_page;
+	}
 }
 
-const char* get_data_index(int index)
+void dsrc_load_preday_data()
 {
-	int count = get_data_count();
+	if (s_cur_page == NULL)	{
+		dsrc_load_today_data();
+	}
+	if (s_cur_page != NULL) {
+		if (s_cur_page->prev == NULL) {
+			int y, m, d = 0;
+			get_date_preday(s_cur_page->year, s_cur_page->month, s_cur_page->day, &y, &m, &d);
+			s_cur_page = s_cur_page->prev = load_data_page(y, m, d);
+		} else {
+			s_cur_page = s_cur_page->prev;
+		}
+	}
+}
+
+void dsrc_load_nextday_data()
+{
+	if (s_cur_page == NULL) {
+		dsrc_load_today_data();
+	}
+	if (s_cur_page != NULL) {
+		if (s_cur_page->next == NULL) {
+			int y, m, d = 0;
+			get_date_nextday(s_cur_page->year, s_cur_page->month, s_cur_page->day, &y, &m, &d);
+			s_cur_page = s_cur_page->next = load_data_page(y, m, d);
+		}
+		else {
+			s_cur_page = s_cur_page->next;
+		}
+	}
+}
+
+int dsrc_get_data_count()
+{
+	if (s_cur_page == NULL)
+		return 0;
+	return s_cur_page->lines;
+}
+
+const char* dsrc_get_data_index(int index)
+{
+	int count = dsrc_get_data_count();
 	if (index < 0 || index >= count)
 		return NULL;
-	return *((char **)(s_page + 1) + index);
+	return *((char **)(s_cur_page + 1) + index);
 }
 
-void save()
+void dsrc_save_cur_data()
 {
 }
 
-void destroy_data_source()
+void dsrc_destroy_data_source()
 {
 }

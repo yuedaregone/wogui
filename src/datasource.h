@@ -1,11 +1,17 @@
 #pragma once
 
-struct DataPage;
+void dsrc_init_data_source();
 
-void init_data_source();
+void dsrc_load_today_data();
 
-const char* get_data_index(int index);
+void dsrc_load_preday_data();
 
-void save();
+void dsrc_load_nextday_data();
 
-void destroy_data_source();
+int dsrc_get_data_count();
+
+const char* dsrc_get_data_index(int index);
+
+void dsrc_save_cur_data();
+
+void dsrc_destroy_data_source();
