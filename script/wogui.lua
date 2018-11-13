@@ -14,6 +14,7 @@ project "wogui"
 	files {
 		path.join(PROJ_DIR, "src/**.h"),
 		path.join(PROJ_DIR, "src/**.cpp"),	
+		path.join(PROJ_DIR, "src/**.c"),
 	}
 	excludes {
 	}

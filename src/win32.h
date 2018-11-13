@@ -1,10 +1,7 @@
 #pragma once
+#include "clib/buffer.h"
 
-const char* GetCurrentPath();
+buffer_t* get_current_path();
 
-bool FileExist(const char* path);
-
-bool NewDirectory(const char* path);
-
-void GetDateToday(int* y, int* m, int* d);
+void get_date_today(int* y, int* m, int* d);
 

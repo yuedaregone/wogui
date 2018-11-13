@@ -1,7 +1,11 @@
 #pragma once
 
-void InitDataSource();
+struct DataPage;
 
-void Save();
+void init_data_source();
 
-void DestroyDataSource();
+const char* get_data_index(int index);
+
+void save();
+
+void destroy_data_source();

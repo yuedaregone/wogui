@@ -92,8 +92,8 @@ static void Render()
 		time += ImGui::GetIO().DeltaTime;
 		ImGui::Begin(TEXT("!"), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize);
 			
-		
-		ImGui::Checkbox("IsÄã Over?", &ischeck);
+		const char* word = get_data_index(0);
+		ImGui::Checkbox(word, &ischeck);
 		
 
 		ImGui::TextColored(color,  "This is some useful text.");
@@ -125,7 +125,7 @@ static void Render()
 
 void InitFramework(int width, int height, void* window)
 {
-	InitDataSource();
+	init_data_source();
 
 	InitOpenGL(width, height);
 	InitGUI(window);
