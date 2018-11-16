@@ -4,6 +4,8 @@ void dsrc_init_data_source();
 
 void dsrc_load_today_data();
 
+void dsrc_add_current_data(const char* data);
+
 void dsrc_load_preday_data();
 
 void dsrc_load_nextday_data();

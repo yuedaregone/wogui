@@ -17,6 +17,7 @@
 #include <windowsx.h>
 #include <tchar.h>
 #include <imgui_internal.h>
+#include <wchar.h>
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
@@ -197,10 +198,21 @@ void    ImGui_ImplWin32_NewFrame()
     }
 }
 
+wchar_t mtow(const char* src)
+{
+	int len = MultiByteToWideChar(CP_ACP, 0, src, -1, NULL, 0);
+	wchar_t unic[2];
+	wmemset(unic, 0, len);
+	MultiByteToWideChar(CP_ACP, 0, src, -1, unic, len);
+	return unic[0];
+}
+
 // Allow compilation with old Windows SDK. MinGW doesn't have default _WIN32_WINNT/WINVER versions.
 #ifndef WM_MOUSEHWHEEL
 #define WM_MOUSEHWHEEL 0x020E
 #endif
+
+unsigned short chinp = 0;
 
 // Process Win32 mouse/keyboard inputs. 
 // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -263,7 +275,26 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     case WM_CHAR:
         // You can also use ToAscii()+GetKeyboardState() to retrieve characters.
         if (wParam > 0 && wParam < 0x10000)
-            io.AddInputCharacter((unsigned short)wParam);
+		{
+			if (wParam > 127)
+			{
+				if (chinp != 0)
+				{
+					chinp |= wParam << 8;
+					io.AddInputCharacter(mtow((const char*)&chinp));
+					chinp = 0;
+				}
+				else
+				{
+					chinp = (unsigned short)wParam;
+				}
+			}
+			else
+			{
+				io.AddInputCharacter((unsigned short)wParam);
+				chinp = 0;
+			}
+		}
         return 0;
     case WM_SETCURSOR:
         if (LOWORD(lParam) == HTCLIENT && ImGui_ImplWin32_UpdateMouseCursor())

@@ -5,7 +5,7 @@
 #include <imgui_impl_win32.h>
 #include <time.h>
 #include <stdio.h>
-#include "datasource.h"
+#include "workrecord.h"
 
 int GetFPS()
 {
@@ -53,8 +53,6 @@ static void DestroyGUI()
 	ImGui::DestroyContext();
 }
 
-bool ischeck = false;
-
 static void Render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -82,46 +80,9 @@ static void Render()
 	*/
 
 	ImGui_ImplOpenGL2_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	
+	ImGui_ImplWin32_NewFrame();	
 
-	ImGui::NewFrame();		
-	{
-		static float time = 0.0f;		
-		static ImVec4 color = ImVec4(0.0f, 0.478f, 0.8f, 1.00f);
-
-		time += ImGui::GetIO().DeltaTime;
-		ImGui::Begin(TEXT("!"), NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize);
-			
-		int count = dsrc_get_data_count();
-		for (int i = 0; i < count; ++i)
-		{
-			const char* word = dsrc_get_data_index(i);
-			ImGui::Checkbox(word, &ischeck);
-		}
-
-		ImGui::TextColored(color,  "This is some useful text.");
-
-		if (time > 5)
-		{			
-			if (int(time + 0.5f) == int(time))
-			{
-				color = ImVec4(0.0f, 0.478f, 0.8f, 1.00f);
-			}
-			else
-			{
-				color = ImVec4(0.855f, 0.227f, 0.0f, 1.00f);
-			}
-
-			if (ImGui::Button("Click"))
-			{
-				time = 0.0f;
-				color = ImVec4(0.0f, 0.478f, 0.8f, 1.00f);
-			}
-		}		
-		ImGui::End();
-	}
-	ImGui::Render();
+	wrd_update();
 
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 }
@@ -129,7 +90,7 @@ static void Render()
 
 void InitFramework(int width, int height, void* window)
 {
-	dsrc_init_data_source();
+	wrd_init();
 
 	InitOpenGL(width, height);
 	InitGUI(window);
@@ -144,4 +105,6 @@ void EndFramework()
 {
 	DestroyOpenGL();
 	DestroyGUI();
+
+	wrd_destroy();
 }

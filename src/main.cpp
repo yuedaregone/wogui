@@ -10,8 +10,8 @@
 #include "console.h"
 
 #define WINDOW_NAME "WOGUI"
-#define WINDOW_WIDTH 200
-#define WINDOW_HEIGHT 150
+#define WINDOW_WIDTH 500
+#define WINDOW_HEIGHT 550
 
 struct SBmpInfo
 {
