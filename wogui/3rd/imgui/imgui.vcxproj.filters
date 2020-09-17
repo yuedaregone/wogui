@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="3rd">
+      <UniqueIdentifier>{715f97b7-a083-4b6b-a891-89f05f2505db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd\misc">
+      <UniqueIdentifier>{46c74853-a381-48b1-b2fd-e5988bc3a717}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd\misc\cpp">
+      <UniqueIdentifier>{f0a7cf1b-8e3e-4f6a-8a2b-7ae4b5ef6a38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd\misc\fonts">
+      <UniqueIdentifier>{4c6ee33b-413e-43a8-9043-f18e6c3d6c83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd\misc\freetype">
+      <UniqueIdentifier>{001069b7-b544-4028-99e5-0221e2542600}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\imconfig.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui_impl_opengl2.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui_impl_win32.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui_internal.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imstb_rectpack.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imstb_textedit.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imstb_truetype.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\misc\freetype\imgui_freetype.h">
+      <Filter>3rd\misc\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="src\misc\cpp\imgui_stdlib.h">
+      <Filter>3rd\misc\cpp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\imgui.cpp">
+      <Filter>3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_demo.cpp">
+      <Filter>3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_draw.cpp">
+      <Filter>3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_impl_opengl2.cpp">
+      <Filter>3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_impl_win32.cpp">
+      <Filter>3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_widgets.cpp">
+      <Filter>3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="src\misc\fonts\binary_to_compressed_c.cpp">
+      <Filter>3rd\misc\fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\misc\cpp\imgui_stdlib.cpp">
+      <Filter>3rd\misc\cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\LICENSE.txt">
+      <Filter>3rd</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
