@@ -7,6 +7,9 @@
     <Filter Include="src\clib">
       <UniqueIdentifier>{0dafd470-d3de-402a-8dbc-736dfc9698c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\tools">
+      <UniqueIdentifier>{d083325a-c26c-4983-aa11-678038296c1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\array_list.h">
@@ -15,16 +18,10 @@
     <ClInclude Include="src\console.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\datasource.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\framework.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\win32.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\workrecord.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\clib\buffer.h">
@@ -33,11 +30,14 @@
     <ClInclude Include="src\clib\fs.h">
       <Filter>src\clib</Filter>
     </ClInclude>
+    <ClInclude Include="src\tools\string_common.h">
+      <Filter>src\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\searchview.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\datasource.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\framework.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -47,14 +47,17 @@
     <ClCompile Include="src\win32.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\workrecord.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\clib\buffer.c">
       <Filter>src\clib</Filter>
     </ClCompile>
     <ClCompile Include="src\clib\fs.c">
       <Filter>src\clib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tools\string_common.cpp">
+      <Filter>src\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="src\searchview.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

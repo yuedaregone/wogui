@@ -5,7 +5,7 @@
 #include <imgui_impl_win32.h>
 #include <time.h>
 #include <stdio.h>
-#include "workrecord.h"
+#include "searchview.h"
 
 int GetFPS()
 {
@@ -82,7 +82,7 @@ static void Render()
 	ImGui_ImplOpenGL2_NewFrame();
 	ImGui_ImplWin32_NewFrame();	
 
-	wrd_update();
+	search_update();
 
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 }
@@ -90,7 +90,7 @@ static void Render()
 
 void InitFramework(int width, int height, void* window)
 {
-	wrd_init();
+	search_init();
 
 	InitOpenGL(width, height);
 	InitGUI(window);
@@ -106,5 +106,5 @@ void EndFramework()
 	DestroyOpenGL();
 	DestroyGUI();
 
-	wrd_destroy();
+	search_destroy();
 }

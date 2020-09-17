@@ -9,3 +9,4 @@ void get_date_preday(int cy, int cm, int cd, int* y, int* m, int* d);
 
 void get_date_nextday(int cy, int cm, int cd, int* y, int* m, int* d);
 
+char* get_choose_folder(char* buffer);

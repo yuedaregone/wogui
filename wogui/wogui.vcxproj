@@ -158,19 +158,19 @@
     <ClInclude Include="src\clib\buffer.h" />
     <ClInclude Include="src\clib\fs.h" />
     <ClInclude Include="src\console.h" />
-    <ClInclude Include="src\datasource.h" />
     <ClInclude Include="src\framework.h" />
+    <ClInclude Include="src\searchview.h" />
+    <ClInclude Include="src\tools\string_common.h" />
     <ClInclude Include="src\win32.h" />
-    <ClInclude Include="src\workrecord.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\clib\buffer.c" />
     <ClCompile Include="src\clib\fs.c" />
-    <ClCompile Include="src\datasource.cpp" />
     <ClCompile Include="src\framework.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\searchview.cpp" />
+    <ClCompile Include="src\tools\string_common.cpp" />
     <ClCompile Include="src\win32.cpp" />
-    <ClCompile Include="src\workrecord.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

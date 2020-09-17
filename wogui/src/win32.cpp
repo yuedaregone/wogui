@@ -4,6 +4,9 @@
 #include <io.h>
 #include <windows.h>
 #include <time.h>
+#include<Shlobj.h>
+
+#pragma comment(lib,"Shell32.lib")
 
 buffer_t* get_current_path()
 {
@@ -62,6 +65,20 @@ void get_date_nextday(int cy, int cm, int cd, int * y, int * m, int * d)
 	*y = rt->tm_year + 1900;
 	*m = rt->tm_mon + 1;
 	*d = rt->tm_mday;
+}
+
+char* get_choose_folder(char* buffer){
+	
+	BROWSEINFO bi = { 0 };
+	bi.hwndOwner = NULL;
+	bi.pszDisplayName = buffer;
+	bi.lpszTitle = TEXT("选择一个文件夹");
+	bi.ulFlags = BIF_NEWDIALOGSTYLE;
+	LPITEMIDLIST idl = SHBrowseForFolder(&bi);
+	if (SHGetPathFromIDList(idl, buffer)) {
+		return buffer;
+	}
+	return NULL;
 }
 
 
